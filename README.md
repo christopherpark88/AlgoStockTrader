@@ -9,3 +9,9 @@ ON FIRST SETUP:
 
 After installing new package, run "pip freeze > requirements.txt"
 
+How to use:
+
+save_sp500_tickers() to get list of s&p500 companies and pickle
+get_yahoo_data to get stock ticker data from yahoo api
+compile_data to compile data into one dataframe
+

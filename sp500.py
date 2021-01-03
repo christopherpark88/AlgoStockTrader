@@ -1,11 +1,16 @@
 import bs4 as bs
 import datetime as dt
 import os
+import matplotlib.pyplot as plt
+from matplotlib import style
+import numpy as np
 import pandas as pd
 from pandas_datareader import data as pdr
 import pickle
 import requests
 import yfinance as yf
+
+style.use('ggplot')
 
 yf.pdr_override
 
@@ -69,15 +74,64 @@ def compile_data():
     with open('sp500tickers.pickle', 'rb') as f:
         tickers = pickle.load(f)
     
-    main_df = pdf.DataFrame()
+    main_df = pd.DataFrame()
 
     # Note: enumerate lets you count through in iterable 0,1,2...
-    for counter, ticker in enumerate(tickers)
-        df = pd.read_csv('stock_dfs/{}.csv'.format(ticker))
-        df.set_index('Data', inplace=True)
+    for counter, ticker in enumerate(tickers):
+        try:
+            df = pd.read_csv('stock_dfs/{}.csv'.format(ticker))
+            df.set_index('Date', inplace=True)  
+        except:
+            print('Error when retrieving data for {ticker}.')
 
-        df.rename(columns = {'Adj Close'})
+        try: 
+            df.rename(columns = {'Adj Close': ticker}, inplace=True)
+            df.drop(['Open', 'High', 'Low', 'Close', 'Volume'], 1, inplace=True)
+        except:
+            print('Error when merging dataframes')
 
-# Tell me about yourself
-# Why do you want to work in supply
-# Why do you want to work in Nestle
+        if main_df.empty: 
+            main_df = df
+        else:
+            main_df = main_df.merge(df, how='outer', on='Date')
+
+        if counter % 10 == 0:
+            print(counter)
+
+    print(main_df.head())
+    main_df.to_csv('sp500_joined_closes.csv')
+
+#compile_data()
+
+def visualize_data():
+    df = pd.read_csv('sp500_joined_closes.csv')
+    #df['AAPL'].plot()
+    #plt.show()
+    df_corr = df.corr()
+
+    print(df_corr.head())
+
+    data = df_corr.values
+    figure = plt.figure()
+    ax = figure.add_subplot(1,1,1)
+
+    heatmap = ax.pcolor(data, cmap=plt.cm.RdYlGn)
+    figure.colorbar(heatmap)
+
+    ax.set_xticks(np.arange(data.shape[0]) + 0.5, minor=False)
+    ax.set_yticks(np.arange(data.shape[1]) + 0.5, minor=False)
+    ax.invert_yaxis()
+    ax.xaxis.tick_top()
+
+    column_labels = df_corr.columns
+    row_labels = df_corr.index
+    
+    ax.set_xticklabels(column_labels)
+    ax.set_yticklabels(row_labels)
+    plt.xticks(rotation=90)
+    heatmap.set_clim(-1,1)
+    plt.tight_layout()
+    plt.show()
+
+
+visualize_data()
