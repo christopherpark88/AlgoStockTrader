@@ -1,4 +1,6 @@
 # AlgoStockTrader
+Temporarily storing CSV files on repo
+
 ON FIRST SETUP:
 1) run "py -3 -m venv .venv"
 2) run ".venv\scripts\activate"
