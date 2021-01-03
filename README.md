@@ -12,7 +12,7 @@ Temporarily storing CSV files on repo
 # ON FIRST SETUP MAC (bash/zsh shell):
 1) You may need to run sudo apt-get install python3-venv first
     run "python3 -m venv .venv"
-2) source /.venv/bin/activate
+2) source .venv/bin/activate
 3) Select new python environment (venv)
 4) Install pip if missing and then
 5) Run "pip install -r requirements.txt" on first setup 
